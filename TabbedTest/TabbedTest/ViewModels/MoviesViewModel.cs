@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TabbedTest.Models;
@@ -9,11 +10,13 @@ using TabbedTest.Services;
 using TabbedTest.Views;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Log = TabbedTest.Services.MyLog;
 
 namespace TabbedTest.ViewModels
 {
     public class MoviesViewModel : BaseViewModel
     {
+        #region Commands etc.
         private Movie _selectedItem;
 
         public ObservableCollection<Movie> Movies { get; }
@@ -27,17 +30,35 @@ namespace TabbedTest.ViewModels
         public Command<Movie> ItemTappedOnce { get; }
         public Command<Movie> ItemTappedTwice { get; }
 
+        #endregion
 
         //Pages are 1-index
-        private int currentPage;
-        private int maxPage;
-        private static readonly int itemsPerPage = 100;
+        private int _currentPage;
+        public int CurrentPage 
+        { 
+            get 
+            { 
+                return _currentPage;
+            } 
+            set 
+            { 
+
+                _currentPage = value;
+                Preferences.Set(nameof(CurrentPage), value);
+            } 
+        }
+        private int _maxPage;
+        private static readonly int ItemsPerPage = 100;
+
+        private readonly CollectionView _cv;
 
 
-        public MoviesViewModel()
+        public MoviesViewModel(CollectionView cv)
         {
+            Log.Trace("Created MoviesViewModel");
+            _cv = cv;
             Title = "Browse";
-            currentPage = Preferences.Get(nameof(currentPage), 1);
+            //_currentPage = Preferences.Get(nameof(_currentPage), 1);
             Movies = new ObservableCollection<Movie>();
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
 
@@ -53,58 +74,85 @@ namespace TabbedTest.ViewModels
 
         async Task ExecuteLoadItemsCommand()
         {
-            IsBusy = true;
+            Log.Trace("Entering ExecuteLoadItemsCommand");
 
+            IsBusy = true;
             Movies.Clear();
             string jsonFilter = Preferences.Get("filter", String.Empty);
-            var filter = String.IsNullOrEmpty(jsonFilter) ? null : JsonConvert.DeserializeObject<Filter>(jsonFilter);
-            var items = filter == null ? await DataStore.GetItemsAsync(true) : await GetMoviesFiltered(filter);
+            var filter = String.IsNullOrEmpty(jsonFilter) ? Filter.GetDefault() : JsonConvert.DeserializeObject<Filter>(jsonFilter);
 
-            maxPage = Math.DivRem(items.Count(), itemsPerPage, out int itemsForLastPage);
-            if (itemsForLastPage > 0) maxPage++;
-            int itemsToLoad = currentPage == maxPage ? itemsForLastPage : itemsPerPage;
-            var itemlist = items.ToList();
-            itemlist = itemlist.GetRange((currentPage - 1) * itemsPerPage, itemsToLoad);
-            foreach (var item in itemlist)
+            var items = await GetMoviesFiltered(filter);
+            if(items.Count() > 0)
             {
-                Movies.Add(item);
-            }
-            Title = $"Page {currentPage}/{maxPage}";
+                _maxPage = Math.DivRem(items.Count(), ItemsPerPage, out int itemsForLastPage);
 
-            IsBusy = false;
-        }
+                itemsForLastPage--;
+                if (itemsForLastPage > 0) _maxPage++;
+                CurrentPage = Preferences.Get(nameof(CurrentPage), 1);
+                if (CurrentPage > _maxPage || CurrentPage == 0) CurrentPage = 1;
 
-        private async Task<IEnumerable<Movie>> GetMoviesFiltered(Filter filter)
-        {
-            var movies = await DataStore.GetItemsAsync();
-            if (filter.OnlyFavourites) movies = movies.Where(m => m.Favourite);
-            if (!String.IsNullOrEmpty(filter.Namefilter)) movies = movies.Where(m => m.MovieName.ToLower().Contains(filter.Namefilter.ToLower()));
-            if (filter.IsAscending)
-            {
-                switch (filter.Order)
+                int itemsToLoad = _currentPage == _maxPage ? itemsForLastPage : ItemsPerPage;
+                var itemlist = items.ToList();
+                try
                 {
-                    case Filter.OrderMethod.Name: return movies.OrderBy(m => m.MovieName);
-                    case Filter.OrderMethod.Size: return movies.OrderBy(m => m.MovieName);
-                    case Filter.OrderMethod.Duration: return movies.OrderBy(m => m.MovieDuration);
-                    case Filter.OrderMethod.USK: return movies.OrderBy(m => m.USK);
-                    case Filter.OrderMethod.Genre: return movies.OrderBy(m => m.Genre);
-                    default: return movies;
+                    itemlist = itemlist.GetRange((_currentPage - 1) * ItemsPerPage, itemsToLoad);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("ExecuteLoadItems GetRange error " + ex.ToString());
+                    throw;
+                }
+
+                foreach (var item in itemlist)
+                {
+                    Movies.Add(item);
                 }
             }
             else
             {
-                switch (filter.Order)
+                _maxPage = 0;
+                CurrentPage = 0;
+            }
+
+            
+            Title = $"Page {_currentPage}/{_maxPage}";
+            IsBusy = false;
+            Log.Trace("Exiting ExecuteLoadItemsCommand");
+        }
+
+        private async Task<IEnumerable<Movie>> GetMoviesFiltered(Filter filter)
+        {
+            var movies = await DataStore.GetItemsAsync(true);
+            if (filter.OnlyFavourites) movies = movies.Where(m => m.Favourite);
+            if (!String.IsNullOrEmpty(filter.Namefilter)) movies = movies.Where(m => m.MovieName.ToLower().Contains(filter.Namefilter.ToLower()));
+            if (filter.IsAscending)
+            {
+                return filter.Order switch
                 {
-                    case Filter.OrderMethod.Name: return movies.OrderByDescending(m => m.MovieName);
-                    case Filter.OrderMethod.Size: return movies.OrderByDescending(m => m.MovieName);
-                    case Filter.OrderMethod.Duration: return movies.OrderByDescending(m => m.MovieDuration);
-                    case Filter.OrderMethod.USK: return movies.OrderByDescending(m => m.USK);
-                    case Filter.OrderMethod.Genre: return movies.OrderByDescending(m => m.Genre);
-                    default: return movies;
-                }
+                    Filter.OrderMethod.Name => movies.OrderBy(m => m.MovieName),
+                    Filter.OrderMethod.Size => movies.OrderBy(m => m.MovieName),
+                    Filter.OrderMethod.Duration => movies.OrderBy(m => m.MovieDuration),
+                    Filter.OrderMethod.USK => movies.OrderBy(m => m.USK),
+                    Filter.OrderMethod.Genre => movies.OrderBy(m => m.Genre),
+                    _ => movies,
+                };
+            }
+            else
+            {
+                return filter.Order switch
+                {
+                    Filter.OrderMethod.Name => movies.OrderByDescending(m => m.MovieName),
+                    Filter.OrderMethod.Size => movies.OrderByDescending(m => m.MovieName),
+                    Filter.OrderMethod.Duration => movies.OrderByDescending(m => m.MovieDuration),
+                    Filter.OrderMethod.USK => movies.OrderByDescending(m => m.USK),
+                    Filter.OrderMethod.Genre => movies.OrderByDescending(m => m.Genre),
+                    _ => movies,
+                };
             }
         }
 
+        #region working shit
+        
         public void OnAppearing()
         {
             IsBusy = true;
@@ -117,6 +165,26 @@ namespace TabbedTest.ViewModels
             await JsonIO.Save(JsonIO.SavedMoviesAppdataPath, movies.ToList());
         }
 
+        async void PageNext()
+        {
+            if (CurrentPage < _maxPage) CurrentPage++;
+            else if (CurrentPage == _maxPage) CurrentPage = 1;
+            else return;
+            _cv.ScrollTo(0, -1, ScrollToPosition.Start, true);
+            await ExecuteLoadItemsCommand();
+
+
+        }
+
+        async void PageBack()
+        {
+            if (CurrentPage > 1) CurrentPage--;
+            else if (CurrentPage == 1) CurrentPage = _maxPage;
+            else return; 
+            _cv.ScrollTo(0, -1, ScrollToPosition.Start, true);
+            await ExecuteLoadItemsCommand();
+        }
+
         public Movie SelectedItem
         {
             get => _selectedItem;
@@ -127,8 +195,12 @@ namespace TabbedTest.ViewModels
             }
         }
 
+        #endregion
+
+
         async Task OnSendItem()
         {
+            Log.Trace("Entering OnSendItem");
             var file = JsonIO.SelectedMoviesCachePath;
 
             var moviesToSave = await DataStore.GetItemsAsync();
@@ -136,7 +208,10 @@ namespace TabbedTest.ViewModels
 
             ShareFile sf = new ShareFile(file, "application/json");
             await Share.RequestAsync(new ShareFileRequest(sf) { Title = "Send movies selection" });
+            Log.Trace("Exiting OnSendItem");
         }
+
+
 
 
         async void OnOpenMovieDetail(Movie movie)
@@ -157,36 +232,6 @@ namespace TabbedTest.ViewModels
             movie.ToggleFavourite();
         }
 
-        async void PageNext()
-        {
-            if (currentPage < maxPage)
-            {
-                currentPage++;
-                Preferences.Set(nameof(currentPage), currentPage);
-                await ExecuteLoadItemsCommand();
-            }
-            else if (currentPage == maxPage)
-            {
-                currentPage = 1;
-                Preferences.Set(nameof(currentPage), currentPage);
-                await ExecuteLoadItemsCommand();
-            }
-        }
-
-        async void PageBack()
-        {
-            if (currentPage > 1)
-            {
-                currentPage--;
-                Preferences.Set(nameof(currentPage), currentPage);
-                await ExecuteLoadItemsCommand();
-            }
-            else if (currentPage == 1)
-            {
-                currentPage = maxPage;
-                Preferences.Set(nameof(currentPage), currentPage);
-                await ExecuteLoadItemsCommand();
-            }
-        }
+        
     }
 }

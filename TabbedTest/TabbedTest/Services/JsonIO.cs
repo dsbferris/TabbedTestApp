@@ -64,7 +64,8 @@ namespace TabbedTest.Services
         public static List<Movie> LoadFromFile(string filepath)
         {
             var json = File.ReadAllText(filepath);
-            return JsonConvert.DeserializeObject<List<Movie>>(json);
+            var movies = JsonConvert.DeserializeObject<List<Movie>>(json);
+            return movies;
 
 
             /* alternative code

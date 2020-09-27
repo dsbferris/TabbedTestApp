@@ -8,11 +8,14 @@
              Title="{Binding Title}"
              x:Name="BrowseMoviesPage">
 
+    
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Back" Command="{Binding BackCommand}"/>
         <ToolbarItem Text="Next" Command="{Binding NextCommand}"/>
         <ToolbarItem Text="Send" Command="{Binding SendItemsCommand}"/>
     </ContentPage.ToolbarItems>
+    
+    <!--#region Activity Indicator-->
     <ContentPage.Content>
         <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
             <AbsoluteLayout>
@@ -20,6 +23,7 @@
             </AbsoluteLayout>
         </StackLayout>
     </ContentPage.Content>
+    <!--#endregion-->
 
         <!--
       x:DataType enables compiled bindings for better performance and compile time validation of binding expressions.
@@ -27,10 +31,10 @@
     -->
     <RefreshView x:DataType="local:MoviesViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
         
-        <CollectionView x:Name="MoviesListView"
-                ItemsSource="{Binding Movies}" 
+        <CollectionView x:Name="MoviesListView" VerticalScrollBarVisibility="Always"
+                ItemsSource="{Binding Movies}" ItemSizingStrategy="MeasureAllItems"
                 SelectionMode="None">
-            
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid Padding="10" x:DataType="model:Movie">
@@ -49,10 +53,10 @@
                         <CheckBox IsChecked="{Binding Favourite}" Grid.RowSpan="2" Grid.Column="0"/>
                         <!-- ListItemTextStyle-->
                         <Label Text="{Binding MovieName}" 
-                            LineBreakMode="NoWrap" 
+                            LineBreakMode="WordWrap" 
                             Style="{DynamicResource ListItemTextStyle}" 
                             FontSize="14" FontAttributes="Bold"
-                            Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="0"/>
+                            Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="0"/>
                         
                         <Label Text="{Binding MovieDuration}" 
                             LineBreakMode="NoWrap"

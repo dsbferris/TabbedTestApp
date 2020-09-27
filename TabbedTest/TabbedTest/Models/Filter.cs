@@ -15,5 +15,17 @@
             Duration,
             Genre
         }
+
+        public static Filter GetDefault()
+        {
+            var f = new Filter()
+            {
+                OnlyFavourites = false,
+                Namefilter = string.Empty,
+                Order = OrderMethod.Name,
+                IsAscending = true
+            };
+            return f;
+        }
     }
 }

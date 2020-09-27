@@ -25,11 +25,14 @@
 
 
                 <Frame>
-                    <Label Text="{Binding MovieName}" FontSize="Large" FontAttributes="Bold" >
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped"/>
-                        </Label.GestureRecognizers>
-                    </Label>
+                    <ScrollView>
+                        <Label Text="{Binding MovieName}" FontSize="Large" FontAttributes="Bold" LineBreakMode="WordWrap">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </ScrollView>
+                    
                 </Frame>
 
                 <Frame Grid.Column="1">

@@ -5,9 +5,11 @@
              xmlns:vm="clr-namespace:TabbedTest.ViewModels"
              Title="{Binding Title}">
 
+    <!--#region Styles-->
     <ContentPage.Resources>
         <ResourceDictionary>
-            
+
+
             <Style TargetType="Label">
                 <Setter Property="FontSize" Value="Medium"/>
                 <Setter Property="VerticalOptions" Value="Center"/>
@@ -25,11 +27,6 @@
                 <Setter Property="CornerRadius" Value="10"/>
             </Style>
 
-            <Style TargetType="RadioButton">
-                <Setter Property="TextColor" Value="{StaticResource TextBlack}"/>
-            </Style>
-
-
             <Style TargetType="Picker">
                 <Setter Property="BackgroundColor" Value="Transparent"/>
                 <Setter Property="TextColor" Value="{StaticResource TextBlack}"/>
@@ -38,136 +35,136 @@
 
         </ResourceDictionary>
     </ContentPage.Resources>
-
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <!--#endregion-->
 
 
-        <StackLayout BackgroundColor="{StaticResource XamLightBlue}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
-            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
-                <ContentView Padding="15" VerticalOptions="FillAndExpand">
-                    <Image Source="xamarin_logo.png" VerticalOptions="Center" HeightRequest="32"/>
-                </ContentView>
-            </StackLayout>
-        </StackLayout>
-        
-        <ScrollView Grid.Row="1">
-            <StackLayout Orientation="Vertical" Margin="10" Padding="10" Spacing="20">
-                
-                <Frame Padding="10,8,10,10">
-                    <StackLayout>
+    <ScrollView Grid.Row="1">
+        <StackLayout Orientation="Vertical" Margin="10" Padding="10" Spacing="20">
+
+            <!--#region Statistics-->
+
+            <Frame Padding="10,8,10,10">
+                <StackLayout>
+                    <StackLayout Orientation="Horizontal">
                         <Label Text="Favourite Statistics: " FontSize="Large"/>
-                        <Label>
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <FormattedString.Spans>
-                                        <Span Text="Favourites: "/>
-                                        <Span Text="{Binding FavouritesCount}"/>
-                                        <Span Text=" / "/>
-                                        <Span Text="{Binding MoviesCount}"/>
-                                    </FormattedString.Spans>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <Label>
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <FormattedString.Spans>
-                                        <Span Text="Size:            "/>
-                                        <Span Text="{Binding FavouritesSize}"/>
-                                        <Span Text=" / "/>
-                                        <Span Text="{Binding MoviesSize}"/>
-                                    </FormattedString.Spans>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <Label>
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <FormattedString.Spans>
-                                        <Span Text="Playtime:    "/>
-                                        <Span Text="{Binding FavouritesDuration}"/>
-                                        <Span Text=" / "/>
-                                        <Span Text="{Binding MoviesDuration}"/>
-                                    </FormattedString.Spans>
-                                </FormattedString>
-                            </Label.FormattedText>
+                        <Button Text="Reset favourites" Clicked="ButtonResetFavourites_Clicked" HeightRequest="38" HorizontalOptions="EndAndExpand"/>
+                    </StackLayout>
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <FormattedString.Spans>
+                                    <Span Text="Favourites: "/>
+                                    <Span Text="{Binding FavouritesCount}"/>
+                                    <Span Text=" / "/>
+                                    <Span Text="{Binding MoviesCount}"/>
+                                </FormattedString.Spans>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <FormattedString.Spans>
+                                    <Span Text="Size:            "/>
+                                    <Span Text="{Binding FavouritesSize}"/>
+                                    <Span Text=" / "/>
+                                    <Span Text="{Binding MoviesSize}"/>
+                                </FormattedString.Spans>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label>
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <FormattedString.Spans>
+                                    <Span Text="Playtime:    "/>
+                                    <Span Text="{Binding FavouritesDuration}"/>
+                                    <Span Text=" / "/>
+                                    <Span Text="{Binding MoviesDuration}"/>
+                                </FormattedString.Spans>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </StackLayout>
+            </Frame>
+
+            <!--#endregion-->
+
+            <!--#region Filtering-->
+
+            <Frame Padding="10,8,10,10">
+                <StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Filtering Options: " FontSize="Large"/>
+                        <Button Text="Reset filter" Clicked="ButtonReset_Clicked" HeightRequest="38" HorizontalOptions="EndAndExpand"/>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <CheckBox VerticalOptions="Center" IsChecked="{Binding ShowOnlyFavourites}"/>
+                        <Label Text="Show only Favourites" VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnlyFavourites_Tapped" NumberOfTapsRequired="1"/>
+                            </Label.GestureRecognizers>
                         </Label>
                     </StackLayout>
-                </Frame>
-
-                <Frame Padding="10,8,10,10">
-                    <StackLayout>
-                        <StackLayout Orientation="Horizontal">
-                            <Label Text="Filtering Options: " FontSize="Large"/>
-                            <Button Text="Reset filter" Clicked="ButtonReset_Clicked" HeightRequest="38" HorizontalOptions="EndAndExpand"/>
-                        </StackLayout>
-                        <StackLayout Orientation="Horizontal">
-                            <CheckBox VerticalOptions="Center" IsChecked="{Binding ShowOnlyFavourites}"/>
-                            <Label Text="Show only Favourites" VerticalOptions="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnlyFavourites_Tapped" NumberOfTapsRequired="1"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                        </StackLayout>
-                        <StackLayout Orientation="Horizontal" Padding="5,0,0,0">
-                            <Label Text="Name:" VerticalOptions="Center"/>
+                    <StackLayout Orientation="Horizontal" Padding="5,0,0,0">
+                        <Label Text="Name:" VerticalOptions="Center"/>
+                        <Frame HorizontalOptions="FillAndExpand" Padding="0">
                             <Entry HorizontalOptions="FillAndExpand" VerticalOptions="Center" Text="{Binding NameFilter}"/>
-                        </StackLayout>
+                        </Frame>
                     </StackLayout>
-                </Frame>
+                </StackLayout>
+            </Frame>
 
-                <Frame Padding="10,5,10,10">
-                    <StackLayout>
-                        <Label Text="Order by:" FontSize="Large" Margin="0,10,0,0"/>
+            <!--#endregion-->
+
+            <!--#region Ordering-->
+
+            <Frame Padding="10,5,10,10">
+                <StackLayout>
+                    <Label Text="Order by:" FontSize="Large" Margin="0,10,0,0"/>
+                    <StackLayout Orientation="Horizontal">
+                        <Frame HorizontalOptions="FillAndExpand" Padding="0">
+                            <Picker ItemsSource="{Binding Methods}" SelectedItem="{Binding Order}" 
+                                        SelectedIndexChanged="Picker_SelectedIndexChanged" 
+                                        HorizontalOptions="FillAndExpand" VerticalOptions="Center"
+                                        HorizontalTextAlignment="Center"/>
+                        </Frame>
+
                         <StackLayout Orientation="Horizontal">
-                            <Picker ItemsSource="{Binding Methods}" SelectedItem="{Binding Order}" SelectedIndexChanged="Picker_SelectedIndexChanged" HorizontalOptions="FillAndExpand"/>
-
-                            <StackLayout Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding IsAscendingOrdered}"/>
-                                <Label Text="Ascending">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="IsAscending_Tapped" NumberOfTapsRequired="1"/>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                            </StackLayout>
-                            <StackLayout Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding IsDescendingOrdered}"/>
-                                <Label Text="Descending">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="IsDescending_Tapped" NumberOfTapsRequired="1"/>
-                                    </Label.GestureRecognizers>
-                                </Label>
-                            </StackLayout>
-
-                            <!--
-                            <RadioButton IsChecked="{Binding IsAscendingOrdered}"/>
+                            <CheckBox IsChecked="{Binding IsAscendingOrdered}"/>
                             <Label Text="Ascending">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="IsAscending_Tapped" NumberOfTapsRequired="1"/>
                                 </Label.GestureRecognizers>
                             </Label>
-                            <RadioButton IsChecked="{Binding IsDescendingOrdered}"/>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsDescendingOrdered}"/>
                             <Label Text="Descending">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="IsDescending_Tapped" NumberOfTapsRequired="1"/>
                                 </Label.GestureRecognizers>
                             </Label>
-                            -->
-                            
                         </StackLayout>
-
                     </StackLayout>
-                </Frame>
-                
-                
-                <Button Margin="10" Text="Buy me Cigaretts! please ;)" Clicked="Button_Clicked"/>
+                </StackLayout>
+            </Frame>
 
+            <!--#endregion-->
+
+            <!--#region Buttons-->
+
+            <StackLayout Orientation="Horizontal" Padding="10,5,10,10">
+
+                <Button Text="Send logs" Clicked="ButtonSendLogs_Clicked" HorizontalOptions="FillAndExpand"/>
+                <Button Text="Clear logs" Clicked="ButtonClearLogs_Clicked"/>
             </StackLayout>
-        </ScrollView>
-    </Grid>
+
+            <Button Margin="10" Text="Buy me Cigaretts! (No scam)" Clicked="ButtonFun_Clicked"/>
+
+            <!--#endregion-->
+
+        </StackLayout>
+    </ScrollView>
 
 </ContentPage>

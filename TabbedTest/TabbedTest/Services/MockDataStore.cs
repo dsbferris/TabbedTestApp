@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TabbedTest.Models;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace TabbedTest.Services
 {
@@ -19,23 +20,25 @@ namespace TabbedTest.Services
 
         private List<Movie> Load()
         {
-            try
+            if (File.Exists(JsonIO.SavedMoviesAppdataPath))
             {
-                if (File.Exists(JsonIO.SavedMoviesAppdataPath))
+                try
                 {
-                    return JsonIO.LoadFromFile(JsonIO.SavedMoviesAppdataPath);
+                    var movies = JsonIO.LoadFromFile(JsonIO.SavedMoviesAppdataPath);
+                    if (movies.Count > 0) return movies;
                 }
-                else
+                catch (System.Exception ex)
                 {
-                    return JsonIO.LoadFromAssets().Result;
+                    MyLog.Error("Could not load items in MockDataStore" + ex.ToString());
                 }
             }
-            catch (System.Exception ex)
-            {
-                Debug.WriteLine("de.ferris exception: " + ex.ToString());
-            }
-            return new List<Movie>();
 
+            return LoadDefault();
+        }
+
+        private List<Movie> LoadDefault()
+        {
+            return JsonIO.LoadFromAssets().Result;
         }
 
         public async Task<bool> AddItemAsync(Movie item)
@@ -75,9 +78,22 @@ namespace TabbedTest.Services
 
         public async Task<IEnumerable<Movie>> GetItemsAsync(bool forceRefresh = false)
         {
-            return await Task.FromResult(items.OrderBy(m => m.MovieName));
+            return await Task.FromResult(items);
         }
 
+        public async Task<bool> ResetItems()
+        {
+            try
+            {
+                File.Delete(JsonIO.SavedMoviesAppdataPath);
+            }
+            catch (System.Exception)
+            {
+                MyLog.Error("Could not delete file for ResetItems");
+            }
+            items.ForEach(m => m.Favourite = false);
+            return await Task.FromResult(true);
+        }
 
     }
 }

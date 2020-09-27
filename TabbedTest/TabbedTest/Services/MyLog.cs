@@ -7,7 +7,7 @@ namespace TabbedTest.Services
 {
     public static class MyLog
     {
-        private static readonly string file = Path.Combine(FileSystem.AppDataDirectory, "logfile.txt");
+        public static readonly string file = Path.Combine(FileSystem.AppDataDirectory, "logfile.txt");
         private static readonly string tag = "ferrisebrise.log";
 
         /// <summary>
@@ -108,6 +108,18 @@ namespace TabbedTest.Services
             {
             }
             return text;
+        }
+
+        public static void Clear()
+        {
+            try
+            {
+                File.Delete(file);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

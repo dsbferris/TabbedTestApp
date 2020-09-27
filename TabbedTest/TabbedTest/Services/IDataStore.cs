@@ -9,6 +9,7 @@ namespace TabbedTest.Services
         Task<bool> UpdateItemAsync(T item);
         Task<bool> DeleteItemAsync(string id);
         Task<bool> DeleteItemsAsync(bool foreceRefresh = true);
+        Task<bool> ResetItems();
         Task<T> GetItemAsync(string id);
         Task<IEnumerable<T>> GetItemsAsync(bool forceRefresh = false);
     }

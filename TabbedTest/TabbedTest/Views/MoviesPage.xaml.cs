@@ -10,8 +10,7 @@ namespace TabbedTest.Views
         public MoviesPage()
         {
             InitializeComponent();
-
-            BindingContext = _viewModel = new MoviesViewModel();
+            BindingContext = _viewModel = new MoviesViewModel(MoviesListView);
         }
 
         protected override void OnAppearing()

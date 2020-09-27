@@ -70,6 +70,7 @@ namespace TabbedTest.ViewModels
                 Genre = m.Genre;
                 Audios = m.Audios;
                 Description = m.Description;
+                Title = MovieName;
             }
             catch (Exception)
             {

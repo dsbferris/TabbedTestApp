@@ -1,13 +1,17 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TabbedTest.Models;
 using Xamarin.Essentials;
 using static TabbedTest.Models.Filter;
+using Log = TabbedTest.Services.MyLog;
 
 namespace TabbedTest.ViewModels
 {
+    [DesignTimeVisible]
     public class InfoViewModel : BaseViewModel
     {
         private int _favCount;
@@ -44,12 +48,19 @@ namespace TabbedTest.ViewModels
 
         public OrderMethod[] Methods => new OrderMethod[] { OrderMethod.Name, OrderMethod.Size, OrderMethod.Duration, OrderMethod.USK, OrderMethod.Genre };
 
+
+
         public InfoViewModel()
         {
-            Title = "Info";
+            Title = "Welcome :)";
         }
 
         public async Task OnAppearing()
+        {
+            await CalculateStatistics();
+        }
+
+        private async Task CalculateStatistics()
         {
             var movies = await DataStore.GetItemsAsync();
             var favs = movies.Where(m => m.Favourite);
@@ -57,12 +68,11 @@ namespace TabbedTest.ViewModels
             MoviesCount = movies.Count();
             FavouritesCount = favs.Count();
 
-            FavouritesSize = Models.Movie.GetBytesReadable(favs.Sum(m => m.FileSize));
-            MoviesSize = Models.Movie.GetBytesReadable(movies.Sum(m => m.FileSize));
+            FavouritesSize = Movie.GetBytesReadable(favs.Sum(m => m.FileSize));
+            MoviesSize = Movie.GetBytesReadable(movies.Sum(m => m.FileSize));
 
             FavouritesDuration = TimeSpan.FromSeconds(favs.Sum(m => m.MovieSeconds)).ToString();
             MoviesDuration = TimeSpan.FromSeconds(movies.Sum(m => m.MovieSeconds)).ToString();
-
         }
 
         public void OnDisappearing()
@@ -91,5 +101,24 @@ namespace TabbedTest.ViewModels
             IsAscendingOrdered = true;
 
         }
+
+        public async Task SendLogs()
+        {
+            Log.Trace("Entering SendLogs");
+            var file = Log.file;
+            if (File.Exists(file))
+            {
+                ShareFile sf = new ShareFile(file, "text/plain");
+                await Share.RequestAsync(new ShareFileRequest(sf) { Title = "Send logs" });
+            }
+            Log.Trace("Exiting SendLogs");
+        }
+
+        public async Task ResetFavourites()
+        {
+            await DataStore.ResetItems();
+            await CalculateStatistics();
+        }
+
     }
 }
