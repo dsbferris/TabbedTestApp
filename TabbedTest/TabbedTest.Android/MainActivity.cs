@@ -15,14 +15,6 @@ namespace TabbedTest.Droid
         {
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
-            try
-            {
-                Xamarin.Forms.Forms.SetFlags(new string[] { "RadioButton_Experimental" });
-            }
-            catch (Exception ex)
-            {
-                Log.Error("ferrisebrise.log", ex.ToString());
-            }
             
             base.OnCreate(savedInstanceState);
 

@@ -26,8 +26,6 @@
             </Style>
 
             <Style TargetType="RadioButton">
-                <Setter Property="BackgroundColor" Value="Transparent"/>
-                <Setter Property="BorderColor" Value="Green"/>
                 <Setter Property="TextColor" Value="{StaticResource TextBlack}"/>
             </Style>
 
@@ -128,6 +126,24 @@
                         <StackLayout Orientation="Horizontal">
                             <Picker ItemsSource="{Binding Methods}" SelectedItem="{Binding Order}" SelectedIndexChanged="Picker_SelectedIndexChanged" HorizontalOptions="FillAndExpand"/>
 
+                            <StackLayout Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsAscendingOrdered}"/>
+                                <Label Text="Ascending">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="IsAscending_Tapped" NumberOfTapsRequired="1"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsDescendingOrdered}"/>
+                                <Label Text="Descending">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="IsDescending_Tapped" NumberOfTapsRequired="1"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </StackLayout>
+
+                            <!--
                             <RadioButton IsChecked="{Binding IsAscendingOrdered}"/>
                             <Label Text="Ascending">
                                 <Label.GestureRecognizers>
@@ -140,6 +156,8 @@
                                     <TapGestureRecognizer Tapped="IsDescending_Tapped" NumberOfTapsRequired="1"/>
                                 </Label.GestureRecognizers>
                             </Label>
+                            -->
+                            
                         </StackLayout>
 
                     </StackLayout>
