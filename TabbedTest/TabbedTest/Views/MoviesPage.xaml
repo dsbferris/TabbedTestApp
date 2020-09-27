@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:TabbedTest.ViewModels"  
+             xmlns:model="clr-namespace:TabbedTest.Models"  
+             
+             x:Class="TabbedTest.Views.MoviesPage"
+             Title="{Binding Title}"
+             x:Name="BrowseMoviesPage">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Back" Command="{Binding BackCommand}"/>
+        <ToolbarItem Text="Next" Command="{Binding NextCommand}"/>
+        <ToolbarItem Text="Send" Command="{Binding SendItemsCommand}"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+            <AbsoluteLayout>
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"/>
+            </AbsoluteLayout>
+        </StackLayout>
+    </ContentPage.Content>
+
+        <!--
+      x:DataType enables compiled bindings for better performance and compile time validation of binding expressions.
+      https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/data-binding/compiled-bindings
+    -->
+    <RefreshView x:DataType="local:MoviesViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+        
+        <CollectionView x:Name="MoviesListView"
+                ItemsSource="{Binding Movies}" 
+                SelectionMode="None">
+            
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="10" x:DataType="model:Movie">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <CheckBox IsChecked="{Binding Favourite}" Grid.RowSpan="2" Grid.Column="0"/>
+                        <!-- ListItemTextStyle-->
+                        <Label Text="{Binding MovieName}" 
+                            LineBreakMode="NoWrap" 
+                            Style="{DynamicResource ListItemTextStyle}" 
+                            FontSize="14" FontAttributes="Bold"
+                            Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="0"/>
+                        
+                        <Label Text="{Binding MovieDuration}" 
+                            LineBreakMode="NoWrap"
+                            Style="{DynamicResource ListItemDetailTextStyle}"
+                            FontSize="13" Grid.Row="1" Grid.Column="1"/>
+                        <Label Text="{Binding SizeReadable}" 
+                            LineBreakMode="NoWrap"
+                            Style="{DynamicResource ListItemDetailTextStyle}"
+                            FontSize="13" Grid.Row="1" Grid.Column="2"/>
+                        <Label  
+                            LineBreakMode="NoWrap"
+                            Style="{DynamicResource ListItemDetailTextStyle}"
+                            FontSize="13" Grid.Row="1" Grid.Column="3">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <FormattedString.Spans>
+                                        <Span Text="USK: "/>
+                                        <Span Text="{Binding USK}"/>
+                                    </FormattedString.Spans>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Text="{Binding Genre}" 
+                            LineBreakMode="NoWrap"
+                            Style="{DynamicResource ListItemDetailTextStyle}"
+                            FontSize="13" Grid.Row="1" Grid.Column="4"/>
+                        
+                        
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                NumberOfTapsRequired="2"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:MoviesViewModel}}, Path=ItemTappedTwice}"		
+                                CommandParameter="{Binding .}">
+                            </TapGestureRecognizer>
+                            <TapGestureRecognizer 
+                                NumberOfTapsRequired="1"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:MoviesViewModel}}, Path=ItemTappedOnce}"		
+                                CommandParameter="{Binding .}">
+                            </TapGestureRecognizer>
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TabbedTest.App">
+    <!--
+        Define global resources and styles here, that apply to all pages in your app.
+    -->
+    
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <Color x:Key="XamLightBlue">#6CB7F5</Color>
+            <Color x:Key="Primary">#2196F3</Color>
+            <Color x:Key="BarColor">#104673</Color>
+            <Color x:Key="ButtonColor">#1B75BF</Color>
+            <Color x:Key="TextBlack">#000000</Color>
+            <Color x:Key="BackgroundWhite">#FFFFFF</Color>
+
+
+            <!--Here is my Code-->
+            
+            <Style TargetType="Frame">
+                <Setter Property="BorderColor" Value="{StaticResource BarColor}"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="CornerRadius" Value="5"/>
+            </Style>
+            
+            <Style TargetType="StackLayout">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+            </Style>
+            <Style TargetType="Grid">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+            </Style>
+
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextBlack}"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+            </Style>
+
+            
+            <Style TargetType="CheckBox">
+                <Setter Property="Color" Value="{StaticResource ButtonColor}"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+            </Style>
+            
+
+        </ResourceDictionary>        
+    </Application.Resources>
+</Application>

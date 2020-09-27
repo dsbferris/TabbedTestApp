@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TabbedTest.Views.MovieDetailPage"
+             xmlns:model="clr-namespace:TabbedTest.Models"
+             Disappearing="ContentPage_Disappearing"
+             Title="{Binding Title}">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="Medium"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout Spacing="5" Margin="15" Padding="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <Frame>
+                    <Label Text="{Binding MovieName}" FontSize="Large" FontAttributes="Bold" >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer NumberOfTapsRequired="1" Tapped="TapGestureRecognizer_Tapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+
+                <Frame Grid.Column="1">
+                    <CheckBox IsChecked="{Binding Favourite}" HorizontalOptions="Center" VerticalOptions="Center" CheckedChanged="CheckBox_CheckedChanged"/>
+                </Frame>
+
+            </Grid>
+
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Frame>
+                    <StackLayout>
+                        <Label Text="Duration" TextDecorations="Underline"/>
+                        <Label Text="{Binding MovieDuration}"/>
+                    </StackLayout>
+                </Frame>
+
+                <Frame Grid.Column="1">
+                    <StackLayout>
+                        <Label Text="Size" TextDecorations="Underline"/>
+                        <Label Text="{Binding SizeReadable}"/>
+                    </StackLayout>
+                </Frame>
+                <Frame Grid.Column="2">
+                    <StackLayout >
+                        <Label Text="USK" TextDecorations="Underline"/>
+                        <Label Text="{Binding USK}"/>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Frame>
+                    <StackLayout>
+                        <Label Text="Genre/Episode" TextDecorations="Underline"/>
+                        <Label Text="{Binding Genre}"/>
+                    </StackLayout>
+                </Frame>
+                <Frame Grid.Column="1">
+                    <StackLayout>
+                        <Label Text="Audios" TextDecorations="Underline"/>
+                        <Label Text="{Binding Audios}"/>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+
+            <Frame>
+                <StackLayout>
+                    <Label Text="Description:" TextDecorations="Underline"/>
+                    <Label Text="{Binding Description}"/>
+                </StackLayout>
+            </Frame>
+           
+
+            
+        </StackLayout>
+    </ScrollView>
+    
+    
+</ContentPage>

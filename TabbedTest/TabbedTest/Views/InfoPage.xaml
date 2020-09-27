@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TabbedTest.Views.InfoPage"
+             xmlns:vm="clr-namespace:TabbedTest.ViewModels"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            
+            <Style TargetType="Label">
+                <Setter Property="FontSize" Value="Medium"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+            </Style>
+            <Style TargetType="Entry">
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="TextColor" Value="{StaticResource TextBlack}"/>
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextBlack}"/>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="TextColor" Value="White"></Setter>
+                <Setter Property="BackgroundColor" Value="{StaticResource ButtonColor}"/>
+                <Setter Property="CornerRadius" Value="10"/>
+            </Style>
+
+            <Style TargetType="RadioButton">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="BorderColor" Value="Green"/>
+                <Setter Property="TextColor" Value="{StaticResource TextBlack}"/>
+            </Style>
+
+
+            <Style TargetType="Picker">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="TextColor" Value="{StaticResource TextBlack}"/>
+                <Setter Property="TitleColor" Value="{StaticResource TextBlack}"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+
+        <StackLayout BackgroundColor="{StaticResource XamLightBlue}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
+                <ContentView Padding="15" VerticalOptions="FillAndExpand">
+                    <Image Source="xamarin_logo.png" VerticalOptions="Center" HeightRequest="32"/>
+                </ContentView>
+            </StackLayout>
+        </StackLayout>
+        
+        <ScrollView Grid.Row="1">
+            <StackLayout Orientation="Vertical" Margin="10" Padding="10" Spacing="20">
+                
+                <Frame Padding="10,8,10,10">
+                    <StackLayout>
+                        <Label Text="Favourite Statistics: " FontSize="Large"/>
+                        <Label>
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <FormattedString.Spans>
+                                        <Span Text="Favourites: "/>
+                                        <Span Text="{Binding FavouritesCount}"/>
+                                        <Span Text=" / "/>
+                                        <Span Text="{Binding MoviesCount}"/>
+                                    </FormattedString.Spans>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label>
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <FormattedString.Spans>
+                                        <Span Text="Size:            "/>
+                                        <Span Text="{Binding FavouritesSize}"/>
+                                        <Span Text=" / "/>
+                                        <Span Text="{Binding MoviesSize}"/>
+                                    </FormattedString.Spans>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label>
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <FormattedString.Spans>
+                                        <Span Text="Playtime:    "/>
+                                        <Span Text="{Binding FavouritesDuration}"/>
+                                        <Span Text=" / "/>
+                                        <Span Text="{Binding MoviesDuration}"/>
+                                    </FormattedString.Spans>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </StackLayout>
+                </Frame>
+
+                <Frame Padding="10,8,10,10">
+                    <StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Filtering Options: " FontSize="Large"/>
+                            <Button Text="Reset filter" Clicked="ButtonReset_Clicked" HeightRequest="38" HorizontalOptions="EndAndExpand"/>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <CheckBox VerticalOptions="Center" IsChecked="{Binding ShowOnlyFavourites}"/>
+                            <Label Text="Show only Favourites" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnlyFavourites_Tapped" NumberOfTapsRequired="1"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" Padding="5,0,0,0">
+                            <Label Text="Name:" VerticalOptions="Center"/>
+                            <Entry HorizontalOptions="FillAndExpand" VerticalOptions="Center" Text="{Binding NameFilter}"/>
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+
+                <Frame Padding="10,5,10,10">
+                    <StackLayout>
+                        <Label Text="Order by:" FontSize="Large" Margin="0,10,0,0"/>
+                        <StackLayout Orientation="Horizontal">
+                            <Picker ItemsSource="{Binding Methods}" SelectedItem="{Binding Order}" SelectedIndexChanged="Picker_SelectedIndexChanged" HorizontalOptions="FillAndExpand"/>
+
+                            <RadioButton IsChecked="{Binding IsAscendingOrdered}"/>
+                            <Label Text="Ascending">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="IsAscending_Tapped" NumberOfTapsRequired="1"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <RadioButton IsChecked="{Binding IsDescendingOrdered}"/>
+                            <Label Text="Descending">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="IsDescending_Tapped" NumberOfTapsRequired="1"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </StackLayout>
+
+                    </StackLayout>
+                </Frame>
+                
+                
+                <Button Margin="10" Text="Buy me Cigaretts! please ;)" Clicked="Button_Clicked"/>
+
+            </StackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>
