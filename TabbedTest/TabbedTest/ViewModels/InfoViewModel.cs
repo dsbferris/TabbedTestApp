@@ -104,20 +104,14 @@ namespace TabbedTest.ViewModels
 
         public async Task SendLogs()
         {
-            Log.Trace("Entering SendLogs");
-            var file = Log.file;
-            if (File.Exists(file))
-            {
-                ShareFile sf = new ShareFile(file, "text/plain");
-                await Share.RequestAsync(new ShareFileRequest(sf) { Title = "Send logs" });
-            }
-            Log.Trace("Exiting SendLogs");
+            await Log.Send();
         }
 
         public async Task ResetFavourites()
         {
             await DataStore.ResetItems();
             await CalculateStatistics();
+            Preferences.Set("CurrentPage", 1);
         }
 
     }

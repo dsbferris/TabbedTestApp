@@ -15,7 +15,7 @@ namespace TabbedTest.Models
         private string _path;
         public string FilePath { get => _path; set => _path = value; }
         [JsonIgnore]
-        public string FileName => Path.GetFileName(FilePath);
+        public string FileName => Path.GetFileNameWithoutExtension(_path).Replace(".001", "").Replace('_', ' ');
         private long _size;
         public long FileSize { get => _size; set => _size = value; }
         [JsonIgnore]
@@ -23,7 +23,7 @@ namespace TabbedTest.Models
 
 
         private string _name;
-        public string MovieName { get => _name; set => _name = value; }
+        public string MovieName { get => String.IsNullOrEmpty(_name) ? FileName : _name; set => _name = value; }
 
         private long _seconds;
         public long MovieSeconds { get => _seconds; set => _seconds = value; }

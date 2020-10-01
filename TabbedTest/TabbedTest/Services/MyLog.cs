@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Xamarin.Essentials;
+using Xamarin.Forms;
 
 namespace TabbedTest.Services
 {
@@ -26,6 +28,11 @@ namespace TabbedTest.Services
         public static void Error(string message)
         {
             Write("ERROR", message);
+            
+            if(Application.Current.MainPage.DisplayAlert("Error!", "Error occured. Please send logs!", "Send now", "Later").Result)
+            {
+                Send().Wait();
+            }
         }
 
         /// <summary>
@@ -119,6 +126,15 @@ namespace TabbedTest.Services
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public static async Task Send()
+        {
+            if (File.Exists(file))
+            {
+                ShareFile sf = new ShareFile(file, "text/plain");
+                await Share.RequestAsync(new ShareFileRequest(sf) { Title = "Send logs" });
             }
         }
     }

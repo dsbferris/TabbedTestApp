@@ -42,12 +42,12 @@ namespace TabbedTest.ViewModels
             } 
             set 
             { 
-
                 _currentPage = value;
                 Preferences.Set(nameof(CurrentPage), value);
             } 
         }
         private int _maxPage;
+        public int MaxPage { get { return _maxPage; } set { _maxPage = value; } }
         private static readonly int ItemsPerPage = 100;
 
         private readonly CollectionView _cv;
@@ -81,41 +81,25 @@ namespace TabbedTest.ViewModels
             string jsonFilter = Preferences.Get("filter", String.Empty);
             var filter = String.IsNullOrEmpty(jsonFilter) ? Filter.GetDefault() : JsonConvert.DeserializeObject<Filter>(jsonFilter);
 
-            var items = await GetMoviesFiltered(filter);
-            if(items.Count() > 0)
+            var items = (await GetMoviesFiltered(filter)).ToList();
+            int count = items.Count();
+            if(count > 0)
             {
-                _maxPage = Math.DivRem(items.Count(), ItemsPerPage, out int itemsForLastPage);
+                items = GetMoviesForPage(items);
 
-                itemsForLastPage--;
-                if (itemsForLastPage > 0) _maxPage++;
-                CurrentPage = Preferences.Get(nameof(CurrentPage), 1);
-                if (CurrentPage > _maxPage || CurrentPage == 0) CurrentPage = 1;
-
-                int itemsToLoad = _currentPage == _maxPage ? itemsForLastPage : ItemsPerPage;
-                var itemlist = items.ToList();
-                try
-                {
-                    itemlist = itemlist.GetRange((_currentPage - 1) * ItemsPerPage, itemsToLoad);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("ExecuteLoadItems GetRange error " + ex.ToString());
-                    throw;
-                }
-
-                foreach (var item in itemlist)
+                foreach (var item in items)
                 {
                     Movies.Add(item);
                 }
             }
             else
             {
-                _maxPage = 0;
+                MaxPage = 0;
                 CurrentPage = 0;
             }
 
             
-            Title = $"Page {_currentPage}/{_maxPage}";
+            Title = $"Page {CurrentPage}/{MaxPage}";
             IsBusy = false;
             Log.Trace("Exiting ExecuteLoadItemsCommand");
         }
@@ -151,6 +135,31 @@ namespace TabbedTest.ViewModels
             }
         }
 
+        private List<Movie> GetMoviesForPage(List<Movie> items)
+        {
+            int count = items.Count;
+            MaxPage = Math.DivRem(count, ItemsPerPage, out int itemsForLastPage);
+            if (itemsForLastPage > 0) MaxPage++;
+            //itemsForLastPage--;
+
+            CurrentPage = Preferences.Get(nameof(CurrentPage), 1);
+            if (CurrentPage > MaxPage || CurrentPage == 0) CurrentPage = 1;
+            int itemsToLoad = CurrentPage == MaxPage ? itemsForLastPage : ItemsPerPage;
+
+            try
+            {
+                return items.GetRange((CurrentPage - 1) * ItemsPerPage, itemsToLoad);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"ExecuteLoadItems GetRange error\ncount: {count}, start: {(CurrentPage - 1) * ItemsPerPage}, itemstoload: {itemsToLoad}, itemslastpage: {itemsForLastPage}\nmaxpage: {MaxPage}, currentpage: {CurrentPage}\n" + ex.ToString());
+#if DEBUG
+                throw;
+#endif
+            }
+            return new List<Movie>();
+        }
+
         #region working shit
         
         public void OnAppearing()
@@ -170,10 +179,8 @@ namespace TabbedTest.ViewModels
             if (CurrentPage < _maxPage) CurrentPage++;
             else if (CurrentPage == _maxPage) CurrentPage = 1;
             else return;
-            _cv.ScrollTo(0, -1, ScrollToPosition.Start, true);
             await ExecuteLoadItemsCommand();
-
-
+            _cv.ScrollTo(0, -1, ScrollToPosition.Start, true);
         }
 
         async void PageBack()
@@ -181,8 +188,8 @@ namespace TabbedTest.ViewModels
             if (CurrentPage > 1) CurrentPage--;
             else if (CurrentPage == 1) CurrentPage = _maxPage;
             else return; 
-            _cv.ScrollTo(0, -1, ScrollToPosition.Start, true);
             await ExecuteLoadItemsCommand();
+            _cv.ScrollTo(Movies.Count() -1, -1, ScrollToPosition.Start, true);
         }
 
         public Movie SelectedItem

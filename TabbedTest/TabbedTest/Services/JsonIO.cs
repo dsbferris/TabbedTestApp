@@ -14,6 +14,13 @@ namespace TabbedTest.Services
         public static string SelectedMoviesCachePath = Path.Combine(FileSystem.CacheDirectory, "selected_movies.json");
         public static string SavedMoviesAppdataPath = Path.Combine(FileSystem.AppDataDirectory, "saved_movies.json");
 
+        private static readonly JsonSerializerSettings settings = new JsonSerializerSettings()
+        {
+            NullValueHandling = NullValueHandling.Include,
+            Error = new EventHandler<Newtonsoft.Json.Serialization.ErrorEventArgs>((sender, e) => MyLog.Error("JsonIO seri error:\n" + e.ToString()))
+        };
+
+
         /// <summary>
         /// Saves movie list to location
         /// </summary>
@@ -21,23 +28,22 @@ namespace TabbedTest.Services
         /// <param name="movies">List of movies</param>
         /// <returns></returns>
         /// <exception cref="Exception">Something went wrong. Use try/catch block!</exception>
-        public static async Task Save(string filepath, List<Movie> movies)
+        public static Task Save(string filepath, List<Movie> movies)
         {
+            /*
             var json = JsonConvert.SerializeObject(movies);
 
             using var writer = File.CreateText(filepath);
             await writer.WriteAsync(json);
-
+            */
 
             //var file = Path.Combine(FileSystem.CacheDirectory, "selected_movies.json");
+            
+            using var stream = new StreamWriter(filepath);
+            using var writer = new JsonTextWriter(stream);
+            JsonSerializer.Create(settings).Serialize(writer, movies);
 
-            /* This is the alternative
-            using (var stream = new StreamWriter(filepath))
-            using (var writer = new JsonTextWriter(stream))
-            {
-                JsonSerializer.CreateDefault().Serialize(writer, movies);
-            }
-            */
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -50,7 +56,7 @@ namespace TabbedTest.Services
             using var stream = await FileSystem.OpenAppPackageFileAsync("movies.json");
             using var sr = new StreamReader(stream);
             using JsonReader reader = new JsonTextReader(sr);
-            var movies = JsonSerializer.CreateDefault().Deserialize<List<Movie>>(reader);
+            var movies = JsonSerializer.Create(settings).Deserialize<List<Movie>>(reader);
             return movies;
 
         }
@@ -63,18 +69,16 @@ namespace TabbedTest.Services
         /// <exception cref="Exception">Something went wrong. Use try/catch block!</exception>
         public static List<Movie> LoadFromFile(string filepath)
         {
+            /*
             var json = File.ReadAllText(filepath);
             var movies = JsonConvert.DeserializeObject<List<Movie>>(json);
             return movies;
-
-
-            /* alternative code
-            using (var stream = new StreamReader(filepath))
-            using (var reader = new JsonTextReader(stream))
-            {
-                return JsonSerializer.CreateDefault().Deserialize<List<Movie>>(reader);
-            }
             */
+
+            using var stream = new StreamReader(filepath);
+            using var reader = new JsonTextReader(stream);
+            var movies = JsonSerializer.Create(settings).Deserialize<List<Movie>>(reader);
+            return movies;
         }
 
 

@@ -157,6 +157,7 @@
             <StackLayout Orientation="Horizontal" Padding="10,5,10,10">
 
                 <Button Text="Send logs" Clicked="ButtonSendLogs_Clicked" HorizontalOptions="FillAndExpand"/>
+                <Button Text="View logs" Clicked="ButtonViewLogs_Clicked" />
                 <Button Text="Clear logs" Clicked="ButtonClearLogs_Clicked"/>
             </StackLayout>
 

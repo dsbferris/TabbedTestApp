@@ -84,5 +84,10 @@ namespace TabbedTest.Views
             if (await DisplayAlert("Delete favourites?", "Are you sure you want to delete all marked favourites?", "Yes", "No"))
             await vm.ResetFavourites();
         }
+
+        private async void ButtonViewLogs_Clicked(object sender, EventArgs e)
+        {
+            await Shell.Current.Navigation.PushAsync(new LogViewPage());
+        }
     }
 }

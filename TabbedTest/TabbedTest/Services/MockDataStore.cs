@@ -83,14 +83,19 @@ namespace TabbedTest.Services
 
         public async Task<bool> ResetItems()
         {
-            try
+            var file = JsonIO.SavedMoviesAppdataPath;
+            if (File.Exists(file))
             {
-                File.Delete(JsonIO.SavedMoviesAppdataPath);
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (System.Exception)
+                {
+                    MyLog.Error("Could not delete file for ResetItems");
+                }
             }
-            catch (System.Exception)
-            {
-                MyLog.Error("Could not delete file for ResetItems");
-            }
+            
             items.ForEach(m => m.Favourite = false);
             return await Task.FromResult(true);
         }
